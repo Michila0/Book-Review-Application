@@ -1,16 +1,16 @@
-import React from 'react';
 import {auth, currentUser} from "@clerk/nextjs/server";
 
+
 export default async function DashboardPag() {
-    const { userId } = auth();
+    const { userId } = await auth();
+    console.log('User Id: ',userId)
 
-    if (!userId) {
-        return <div>You are not logged in</div>
-    }
+    // if (userId === null) {
+    //     return <div>You are not logged in</div>
+    // }
 
+    console.log(<div>log in user</div>)
 
-    const user = await currentUser()
-    console.log(user);
 
     return (
         <div>dashboard</div>
