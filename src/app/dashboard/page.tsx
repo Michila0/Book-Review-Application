@@ -1,18 +1,31 @@
+"use server";
 import {auth, currentUser} from "@clerk/nextjs/server";
 
+export default async function DashboardPage() {
+    const { userId } = auth();
+    const user = await currentUser();
 
-export default async function DashboardPag() {
-    const { userId } = await auth();
-    console.log('User Id: ',userId)
-
-    // if (userId === null) {
-    //     return <div>You are not logged in</div>
-    // }
-
-    console.log(<div>log in user</div>)
+    if (!userId || !user) {
+        console.log('User Id: null');
+        return <div>User ID is null. Please log in.</div>;
+    }
 
 
     return (
-        <div>dashboard</div>
+        <div className='mt-10 text-start max-w-xl mx-auto bg-neutral-200 p-5 rounded'>
+            <h1 className='text-4xl font-bold'>Welcome</h1>
+            <ul className='list-none mt-10'>
+                <li className='mb-2'>
+                    <span className='font-semibold'>First Name:</span> {user.firstName}
+                </li>
+                <li className='mb-2'>
+                    <span className='font-semibold'>Last Name:</span> {user.lastName}
+                </li>
+                <li className='mb-2'>
+                    <span className='font-semibold'>Email:</span>{' '}
+                    {user.emailAddresses[0].emailAddress}
+                </li>
+            </ul>
+        </div>
     );
 }
