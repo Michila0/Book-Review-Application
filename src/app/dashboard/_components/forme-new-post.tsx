@@ -1,6 +1,6 @@
 "use client"
 
-import {ChangeEvent, useState} from "react";
+import {ChangeEvent, FormEvent, useState} from "react";
 import {FormData} from "@/types/post";
 import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/textarea";
@@ -9,6 +9,8 @@ import {Button} from "@/components/ui/button";
 import { useFormStatus } from "react-dom";
 import {Book} from "@prisma/client";
 import Image from "next/image";
+import {router} from "next/client";
+import axios from "axios";
 
 
 
@@ -19,9 +21,10 @@ export default function FormNewPost({book}: {book?: Book | null}) {
     const [formData, setFormData] = useState<FormData>({
         title: '',
         author: '',
-        description: '',
+        discription: '',
         coverImage: ''
     })
+    console.log(formData)
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         e.preventDefault();
@@ -32,9 +35,21 @@ export default function FormNewPost({book}: {book?: Book | null}) {
         });
     };
 
+    async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+        e.preventDefault()
+        try {
+            const response =  await axios.post('api/post', formData);
+            if (response.status === 200) {
+                router.push(`/books/${response.data.newPost.id}`)
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     return (
         <>
-            <form className='mt-10 text-start max-w-xl mx-auto bg-neutral-200 p-5 rounded'>
+            <form className='mt-10 text-start max-w-xl mx-auto bg-neutral-200 p-5 rounded' onSubmit={handleSubmit}>
                 <div className='mb-4 space-y-4'>
                     <div className='space-y-2'>
                         <Label htmlFor='title'>Title</Label>
@@ -67,10 +82,10 @@ export default function FormNewPost({book}: {book?: Book | null}) {
                         <Textarea
                             // type='text'
                             className={inputClass}
-                            placeholder='Enter the description'
-                            name='description'
-                            id='description'
-                            value={formData.description}
+                            placeholder='Enter the discription'
+                            name='discription'
+                            id='discription'
+                            value={formData.discription}
                             onChange={handleChange}
                         />
                     </div>

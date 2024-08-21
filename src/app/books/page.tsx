@@ -1,34 +1,46 @@
-"use client"
+"use server"
 import React from 'react';
 import Image from "next/image";
 import Link from "next/link";
+import db from "@/db/db";
 
-type Book = {
-    id: number;
-    title: string;
-    author: string;
-    coverImage: string;
-    description: string;
-};
+// type Book = {
+//     id: number;
+//     title: string;
+//     author: string;
+//     coverImage: string;
+//     description: string;
+// };
 
-const books: Book[] = [
-    {
-        id: 1,
-        title: 'The Great Gatsby',
-        author: 'F. Scott Fitzgerald',
-        coverImage: '/images/great-gatsby.jpeg',
-        description: 'A novel about the American dream...',
-    },
-    {
-        id: 2,
-        title: '1984',
-        author: 'George Orwell',
-        coverImage: '/images/1984.jpeg',
-        description: 'A dystopian novel set in a totalitarian society...',
-    },
-];
+// const books: Book[] = [
+//     {
+//         id: 1,
+//         title: 'The Great Gatsby',
+//         author: 'F. Scott Fitzgerald',
+//         coverImage: '/images/great-gatsby.jpeg',
+//         description: 'A novel about the American dream...',
+//     },
+//     {
+//         id: 2,
+//         title: '1984',
+//         author: 'George Orwell',
+//         coverImage: '/images/1984.jpeg',
+//         description: 'A dystopian novel set in a totalitarian society...',
+//     },
+// ];
 
-const BookList: React.FC = () => {
+
+
+export default async function BookList() {
+
+    const books = await db.book.findMany({
+        orderBy: {
+            createdAt: 'desc'
+        },
+        include: {
+            author: true
+        }
+    })
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
             {books.map((book) => (
@@ -43,8 +55,8 @@ const BookList: React.FC = () => {
                         />
                         <div className="mt-4">
                             <h3 className="text-xl font-bold">{book.title}</h3>
-                            <p className="text-gray-600">by {book.author}</p>
-                            <p className="mt-2 text-gray-500">{book.description}</p>
+                            <p className="text-gray-600">by {book.authorId}</p>
+                            <p className="mt-2 text-gray-500">{book.discription}</p>
                         </div>
 
                     </Link>
@@ -55,5 +67,3 @@ const BookList: React.FC = () => {
         </div>
     );
 };
-
-export default BookList;
