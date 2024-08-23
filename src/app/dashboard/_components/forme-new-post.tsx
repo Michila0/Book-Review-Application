@@ -92,7 +92,7 @@ export default function FormNewPost({book}: {book?: Book | null}) {
 
                     <div className='space-y-2'>
                         <Label htmlFor='image'>Image</Label>
-                        <Input type='file' name='image' id='image' required={book == null}/>
+                        <Input type='file' name='image' id='image' required={book == null} onChange={handleChange}/>
                         {book != null && (
                             <Image src={book.coverImage} alt='Product Image' height='400' width='400'/>
                         )}

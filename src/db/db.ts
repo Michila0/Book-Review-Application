@@ -1,9 +1,11 @@
 import {  PrismaClient } from '@prisma/client'
+import {clerkClient} from "@clerk/nextjs/server";
 
 
 const prismaClientSingleton = () => {
     return new PrismaClient()
 }
+
 
 declare const globalThis: {
     prismaGlobal: ReturnType<typeof prismaClientSingleton>;
