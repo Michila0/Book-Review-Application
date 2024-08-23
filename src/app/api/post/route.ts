@@ -14,7 +14,10 @@ export async function POST(req: Request) {
 
         const newPost = await db.book.create({
             data: {
-                title, author, discription, coverImage, authorEmail: user.emailAddresses
+                title,
+                author,
+                discription,
+                coverImage,
             }
         });
         return NextResponse.json({newPost}, {status: 200})
