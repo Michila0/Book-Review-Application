@@ -1,12 +1,11 @@
 "use client"
 
-import {ChangeEvent, FormEvent, useState} from "react";
-import {FormData} from "@/types/globals";
+import {ChangeEvent, FormEvent, useEffect, useState} from "react";
+import {FormData} from "@/types/post";
 import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/textarea";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
-import { useFormStatus } from "react-dom";
 import {Book} from "@prisma/client";
 import Image from "next/image";
 import axios from "axios";
@@ -26,9 +25,19 @@ export default function FormNewPost({book}: {book?: Book | null}) {
         coverImage: ''
     })
 
+    useEffect(() => {
+        if (book) {
+            setFormData({
+                title: book.title || '',
+                author: book.authorId || '',
+                discription: book.discription || '',
+                coverImage: book.coverImage || '',
+            });
+        }
+    }, [book]);
+
     const data = useSession()
     const router = useRouter();
-    // console.log(formData)
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         e.preventDefault();
@@ -43,9 +52,18 @@ export default function FormNewPost({book}: {book?: Book | null}) {
         e.preventDefault()
         try {
             const response =  await axios.post('api/post', formData);
+            console.log('Response Data:', response)
             if (response.status === 200) {
 
-                router.push(`/books/${response.data.newPost.id}`)
+                // router.push(`/books/${response.data.newPost.id}`)
+
+                const newPost = response.data.newPost;
+                if (newPost && newPost.id) {
+                    router.push(`/books/${newPost.id}`);
+                } else {
+                    console.error('New post data is missing or does not contain an id');
+                    // Handle this scenario gracefully, e.g., show an error message to the user
+                }
             }
         } catch (error) {
             console.error(error);
@@ -85,7 +103,7 @@ export default function FormNewPost({book}: {book?: Book | null}) {
                     <div className='space-y-2'>
                         <Label htmlFor='title'>Description</Label>
                         <Textarea
-                            // type='text'
+                            key='text'
                             className={inputClass}
                             placeholder='Enter the discription'
                             name='discription'
@@ -98,7 +116,7 @@ export default function FormNewPost({book}: {book?: Book | null}) {
                     <div className='space-y-2'>
                         <Label htmlFor='image'>Image</Label>
                         <Input type='file' name='image' id='image' required={book == null}/>
-                        {book != null && (
+                        {book?.coverImage != null && (
                             <Image src={book.coverImage} alt='Product Image' height='400' width='400'/>
                         )}
                     </div>
@@ -110,8 +128,3 @@ export default function FormNewPost({book}: {book?: Book | null}) {
         </>
     );
 }
-
-// function SubmitButton() {
-//     const { pending } = useFormStatus()
-//     return <Button type='submit' disabled={pending}>{pending ? "Saving..." : "Save"}</Button>
-// }

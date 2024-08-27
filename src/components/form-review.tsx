@@ -1,7 +1,9 @@
+"use client"
 import React, {ChangeEvent, useState} from 'react';
 import axios from "axios";
 import {useSession} from "@clerk/nextjs";
 import {useRouter} from "next/navigation";
+import {Button} from "@/components/ui/button";
 
 interface FormReviewProps {
     bookId: string
@@ -39,7 +41,7 @@ export default function FormReview({bookId}: FormReviewProps) {
                     htmlFor='comment'
                     className='block text-gray-700 text-sm font-bold mb-2'
                 >
-                    Add Comment
+                    Add Review
                 </label>
                 <input
                     value={review}
@@ -49,13 +51,13 @@ export default function FormReview({bookId}: FormReviewProps) {
                     name='comment'
 
                 />
-                <button
+                <Button
                     // disabled={!data?.user?.email}
                     onClick={handleSubmitReview}
                     className='bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md mt-2 disabled:bg-gray-400'
                 >
-                    Submit Comment
-                </button>
+                    Submit Review
+                </Button>
             </div>
         </div>
     );

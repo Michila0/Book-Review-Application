@@ -19,7 +19,7 @@ export default async function Reviews({bookId}: ReviewsProps) {
 
     return (
         <div className='mt-8'>
-            <h2 className="text-2xl font-bold">Comments</h2>
+            <h2 className="text-2xl font-bold">Reviews</h2>
             <ul>
                 {reviews.map((review) => (
                     <li key={review.id} className='mb-4 bg-slate-300 p-2'>

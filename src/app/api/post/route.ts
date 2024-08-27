@@ -1,23 +1,22 @@
 import {NextRequest, NextResponse} from "next/server";
 import db from "@/db/db";
-import {getCurrentUser} from "@/lib/session";
 import {auth} from "@clerk/nextjs/server";
 
 
 export async function POST(req: NextRequest) {
-console.log("requ-",req.body)
-    const user = await auth()
+    const authData = await auth()
+    const userId = authData.userId as string | undefined;
     try {
 
 
-        if (!user) {
+        if (!userId) {
             return NextResponse.json({ message: 'User not found!' }, { status: 404 });
         }
 
 
-        const { title, authorId, discription, coverImage} = await req.json();
+        const { title, author, discription, coverImage} = await req.json();
 
-        if (!title || !authorId || !discription || !coverImage) {
+        if (!title || !author || !discription) {
             return NextResponse.json({
                 error: "Missing required fields",
                 status: 400,
@@ -27,14 +26,13 @@ console.log("requ-",req.body)
         const newPost = await db.book.create({
             data: {
                 title,
-                authorId,
+                author,
                 discription,
-                coverImage: coverImage || null, //'/images/great-gatsby.jpeg',//coverImage || null,
-                userId: user.userId,
-
+                coverImage, //'/images/great-gatsby.jpeg',//coverImage || null,
 
             }
         });
+        console.log('New post created: ', newPost)
         return NextResponse.json({newPost}, {status: 200})
     } catch (error) {
         console.log('Error creating new post: ', error)
@@ -42,3 +40,27 @@ console.log("requ-",req.body)
     }
 }
 
+export async function GET() {
+    try {
+        const authData = await auth();
+        const userId = authData.userId as string | undefined;
+
+        if (!userId) {
+            return NextResponse.json({ error: "Unauthorized", status: 401 });
+        }
+
+        const posts = await db.book.findMany({
+            where: {
+                userId
+            },
+        });
+        if (posts.length === 0) {
+            return NextResponse.json({ message: "No books found", posts: [] }, { status: 200 });
+        }
+
+        return NextResponse.json({posts}, {status: 200});
+    } catch (error) {
+        console.log("ERROR GETTING TASKS: ", error);
+        return NextResponse.json({ error: "Error updating task", status: 500 });
+    }
+}

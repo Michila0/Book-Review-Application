@@ -1,9 +1,8 @@
-import {getAuth} from "@clerk/nextjs/server";
+import {auth, getAuth} from "@clerk/nextjs/server";
 import {clerkClient} from "@clerk/nextjs/server";
-import {NextRequest, NextResponse} from "next/server";
 
-export async function getCurrentUser(req: NextRequest) {
-    const { userId } = await getAuth(req);
+export async function getCurrentUser() {
+    const { userId } = await auth();
 
     if (!userId) {
         return null;

@@ -42,15 +42,12 @@ export default async function BookList() {
             // user: true,
             // reviews: true
         },
-        // where: {
-        //     userId: string,
-        // }
     })
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
             {books.map((book) => (
-                <div key={book.id} className="bg-white shadow-lg rounded-lg p-4">
-                    <Link href={`/books/${book.id}`}>
+                <div className="bg-white shadow-lg rounded-lg p-4">
+                    <Link key={book.id} href={`/books/${book.id}`}>
                         <Image
                             height='300'
                             width='300'
@@ -63,7 +60,6 @@ export default async function BookList() {
                             <p className="text-gray-600">by {book?.author?.name}</p>
                             <p className="mt-2 text-gray-500">{book.discription}</p>
                         </div>
-
                     </Link>
 
 

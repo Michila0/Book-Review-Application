@@ -46,6 +46,8 @@
 
 import React from 'react';
 import db from "@/db/db";
+import Reviews from "@/components/reviews";
+import FormReview from "@/components/form-review";
 
 interface BookDetailPageProps {
     params: {
@@ -54,6 +56,33 @@ interface BookDetailPageProps {
 }
 
 export default async function BookDetailsPage({params}: BookDetailPageProps) {
+
+    // const [book, setBook] = useState<any>(null);
+    //
+    // const [loading, setLoading] = useState<boolean>(true);
+    //
+    // useEffect(() => {
+    //     const fetchBookDetails = async () => {
+    //         try {
+    //             const response = await axios.get(`/api/post/${params.id}`);
+    //             setBook(response.data);
+    //             setLoading(false);
+    //         } catch (error) {
+    //             console.error('Error fetching book details:', error);
+    //             setLoading(false);
+    //         }
+    //     };
+    //
+    //     fetchBookDetails();
+    // }, [params.id]);
+    // if (loading) {
+    //     return <div>Loading...</div>;
+    //
+    // }
+    // if (!book) {
+    //     return <div>Book not found</div>;
+    //
+    // }
     const book = await db.book.findFirst({
         where: {
             id: params.id
@@ -62,15 +91,18 @@ export default async function BookDetailsPage({params}: BookDetailPageProps) {
             author: true
         }
     })
+
     return (
         <div className='max-w-4xl mx-auto py-8'>
             <h1 className='text-3xl font-bold'>{book?.title}</h1>
             <p>Written by: {book?.author?.name}</p>
-            <img src={book?.coverImage} alt={book?.title} className="w-64 h-auto mb-4"/>
+            <img src={book?.coverImage || '/path/to/placeholder-image.jpg'}
+                 alt={book?.coverImage || 'Book Cover'}
+                 className="w-64 h-auto mb-4"/>
             <div className="mt-4">{book?.discription}</div>
 
-            {/*<Reviews/>*/}
-            {/*<FormReviews/>*/}
+            <Reviews bookId={params.id}/>
+            <FormReview bookId={params.id}/>
         </div>
     );
 }
