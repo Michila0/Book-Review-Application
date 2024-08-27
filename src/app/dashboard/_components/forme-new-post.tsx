@@ -1,7 +1,7 @@
 "use client"
 
 import {ChangeEvent, FormEvent, useState} from "react";
-import {FormData} from "@/types/post";
+import {FormData} from "@/types/globals";
 import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/textarea";
 import {Input} from "@/components/ui/input";
@@ -9,8 +9,9 @@ import {Button} from "@/components/ui/button";
 import { useFormStatus } from "react-dom";
 import {Book} from "@prisma/client";
 import Image from "next/image";
-import {router} from "next/client";
 import axios from "axios";
+import {useRouter} from "next/navigation";
+import {useSession} from "@clerk/nextjs";
 
 
 
@@ -24,7 +25,10 @@ export default function FormNewPost({book}: {book?: Book | null}) {
         discription: '',
         coverImage: ''
     })
-    console.log(formData)
+
+    const data = useSession()
+    const router = useRouter();
+    // console.log(formData)
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         e.preventDefault();
@@ -40,6 +44,7 @@ export default function FormNewPost({book}: {book?: Book | null}) {
         try {
             const response =  await axios.post('api/post', formData);
             if (response.status === 200) {
+
                 router.push(`/books/${response.data.newPost.id}`)
             }
         } catch (error) {
@@ -92,19 +97,21 @@ export default function FormNewPost({book}: {book?: Book | null}) {
 
                     <div className='space-y-2'>
                         <Label htmlFor='image'>Image</Label>
-                        <Input type='file' name='image' id='image' required={book == null} onChange={handleChange}/>
+                        <Input type='file' name='image' id='image' required={book == null}/>
                         {book != null && (
                             <Image src={book.coverImage} alt='Product Image' height='400' width='400'/>
                         )}
                     </div>
                 </div>
-                <SubmitButton/>
+                <Button disabled={!data.session?.user} type='submit'>
+                    Submit
+                </Button>
             </form>
         </>
     );
 }
 
-function SubmitButton() {
-    const { pending } = useFormStatus()
-    return <Button type='submit' disabled={pending}>{pending ? "Saving..." : "Save"}</Button>
-}
+// function SubmitButton() {
+//     const { pending } = useFormStatus()
+//     return <Button type='submit' disabled={pending}>{pending ? "Saving..." : "Save"}</Button>
+// }

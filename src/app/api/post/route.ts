@@ -1,32 +1,37 @@
 import {NextRequest, NextResponse} from "next/server";
 import db from "@/db/db";
-import {clerkClient, getAuth} from "@clerk/nextjs/server";
+import {getCurrentUser} from "@/lib/session";
+import {auth} from "@clerk/nextjs/server";
 
 
 export async function POST(req: NextRequest) {
-    const { userId, sessionId } = await getAuth(req);
-    console.log('sessionId: ', sessionId)
-
-    if (!userId) {
-        return NextResponse.json({ message: 'Not Authenticated!' }, { status: 401 });
-    }
-
-    const user =  await clerkClient().sessions.getSession(userId)
-
+console.log("requ-",req.body)
+    const user = await auth()
     try {
+
+
         if (!user) {
-            return NextResponse.json({message:'Not Authenticated!'}, {status: 401})
+            return NextResponse.json({ message: 'User not found!' }, { status: 404 });
         }
 
-        const { title, author, discription, coverImage} = await req.json();
+
+        const { title, authorId, discription, coverImage} = await req.json();
+
+        if (!title || !authorId || !discription || !coverImage) {
+            return NextResponse.json({
+                error: "Missing required fields",
+                status: 400,
+            });
+        }
 
         const newPost = await db.book.create({
             data: {
                 title,
-                author,
+                authorId,
                 discription,
-                coverImage: coverImage || null,
-                userId: user.id
+                coverImage: coverImage || null, //'/images/great-gatsby.jpeg',//coverImage || null,
+                userId: user.userId,
+
 
             }
         });
@@ -36,3 +41,4 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({message: 'Something went wrong'}, {status:500})
     }
 }
+

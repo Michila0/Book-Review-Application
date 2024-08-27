@@ -38,8 +38,13 @@ export default async function BookList() {
             createdAt: 'desc'
         },
         include: {
-            author: true
-        }
+            author: true,
+            // user: true,
+            // reviews: true
+        },
+        // where: {
+        //     userId: string,
+        // }
     })
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
@@ -55,7 +60,7 @@ export default async function BookList() {
                         />
                         <div className="mt-4">
                             <h3 className="text-xl font-bold">{book.title}</h3>
-                            <p className="text-gray-600">by {book.authorId}</p>
+                            <p className="text-gray-600">by {book?.author?.name}</p>
                             <p className="mt-2 text-gray-500">{book.discription}</p>
                         </div>
 
