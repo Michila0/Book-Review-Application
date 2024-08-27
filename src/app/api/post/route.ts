@@ -23,10 +23,31 @@ export async function POST(req: NextRequest) {
             });
         }
 
+        // Fetch the author object based on the author name
+        const authorRecord = await db.author.findFirst({
+            where: {
+                name: author
+            }
+        });
+
+        // If author does not exist, create one
+        let authorId;
+        if (!authorRecord) {
+            const newAuthor = await db.author.create({
+                data: {
+                    name: author,
+                },
+            });
+            authorId = newAuthor.id;
+        } else {
+            authorId = authorRecord.id;
+        }
+
+        // Create a new book post
         const newPost = await db.book.create({
             data: {
                 title,
-                author,
+                authorId,
                 discription,
                 coverImage, //'/images/great-gatsby.jpeg',//coverImage || null,
 
