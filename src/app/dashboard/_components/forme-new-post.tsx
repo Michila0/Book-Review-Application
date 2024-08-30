@@ -1,7 +1,7 @@
 "use client"
 
 import {ChangeEvent, FormEvent, useEffect, useState} from "react";
-import {FormData} from "@/types/post";
+import {FormData as PostFormData} from "@/types/post";
 import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/textarea";
 import {Input} from "@/components/ui/input";
@@ -18,12 +18,15 @@ const inputClass = 'w-full py-2 px-3 border border-gray-300 rounded-md focus:out
 
 export default function FormNewPost({book}: {book?: Book | null}) {
 
-    const [formData, setFormData] = useState<FormData>({
+    const [formData, setFormData] = useState<PostFormData>({
         title: '',
         author: '',
         discription: '',
         coverImage: ''
     })
+
+    const [selectedImage, setSelectedImage] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
 
     useEffect(() => {
         if (book) {
@@ -33,6 +36,7 @@ export default function FormNewPost({book}: {book?: Book | null}) {
                 discription: book.discription || '',
                 coverImage: book.coverImage || '',
             });
+            setImagePreview(book.coverImage || null)
         }
     }, [book]);
 
@@ -48,10 +52,37 @@ export default function FormNewPost({book}: {book?: Book | null}) {
         });
     };
 
+    const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setSelectedImage(file);
+            setImagePreview(URL.createObjectURL(file));
+        }
+    };
+
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault()
         try {
-            const response =  await axios.post('api/post', formData);
+            let imageUrl = formData.coverImage;
+            console.log('😎: ', imageUrl)
+
+            if (selectedImage) {
+                const formDataImage = new FormData();
+                formDataImage.append('file', selectedImage);
+
+                // Add your image upload endpoint here
+                const uploadResponse = await axios.post('/api/upload', formDataImage,
+                    // headers: {
+                    //     'Content-Type': 'multipart/form-data',
+                    // },
+                );
+                imageUrl = uploadResponse.data.url;
+                //return imageUrl
+            }
+
+
+
+            const response =  await axios.post('api/post', {...formData, coverImage: imageUrl});
             console.log('Response Data:', response)
             if (response.status === 200) {
 
@@ -62,7 +93,6 @@ export default function FormNewPost({book}: {book?: Book | null}) {
                     router.push(`/books/${newPost.id}`);
                 } else {
                     console.error('New post data is missing or does not contain an id');
-                    // Handle this scenario gracefully, e.g., show an error message to the user
                 }
             }
         } catch (error) {
@@ -115,9 +145,14 @@ export default function FormNewPost({book}: {book?: Book | null}) {
 
                     <div className='space-y-2'>
                         <Label htmlFor='image'>Image</Label>
-                        <Input type='file' name='image' id='image' required={book == null}/>
-                        {book?.coverImage != null && (
-                            <Image src={book.coverImage} alt='Product Image' height='400' width='400'/>
+                        <Input type='file' name='image' id='image' onChange={handleImageChange}/>
+                        {imagePreview != null && (
+                            <Image
+                                src={imagePreview}
+                                alt='Image Preview'
+                                height='100'
+                                width='100'
+                            />
                         )}
                     </div>
                 </div>

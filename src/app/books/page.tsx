@@ -1,45 +1,19 @@
 "use server"
+
 import React from 'react';
 import Image from "next/image";
 import Link from "next/link";
 import db from "@/db/db";
 
-// type Book = {
-//     id: number;
-//     title: string;
-//     author: string;
-//     coverImage: string;
-//     description: string;
-// };
-
-// const books: Book[] = [
-//     {
-//         id: 1,
-//         title: 'The Great Gatsby',
-//         author: 'F. Scott Fitzgerald',
-//         coverImage: '/images/great-gatsby.jpeg',
-//         description: 'A novel about the American dream...',
-//     },
-//     {
-//         id: 2,
-//         title: '1984',
-//         author: 'George Orwell',
-//         coverImage: '/images/1984.jpeg',
-//         description: 'A dystopian novel set in a totalitarian society...',
-//     },
-// ];
-
-
-
 export default async function BookList() {
 
     const books = await db.book.findMany({
         orderBy: {
-            createdAt: 'desc'
+            createdAt: 'desc',
         },
         include: {
             author: true,
-            // user: true,
+            user: true,
             // reviews: true
         },
     })
@@ -48,13 +22,23 @@ export default async function BookList() {
             {books.map((book) => (
                 <div className="bg-white shadow-lg rounded-lg p-4">
                     <Link key={book.id} href={`/books/${book.id}`}>
-                        <Image
-                            height='300'
-                            width='300'
-                            src={book.coverImage}
-                            alt={book.title}
-                            className="w-full h-48 object-cover rounded-lg"
-                        />
+                        <div>
+                            {book.coverImage ? (
+                                <Image
+                                    height='300'
+                                    width='300'
+                                    src={book.coverImage}
+                                    alt={book.title}
+                                    className="w-full h-48 object-cover rounded-lg"
+
+                                />
+                            )
+                            : (
+                                <div className="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center">
+                                    <span className="text-gray-500">No Image Available</span>
+                                </div>
+                            )}
+                        </div>
                         <div className="mt-4">
                             <h3 className="text-xl font-bold">{book.title}</h3>
                             <p className="text-gray-600">by {book?.author?.name}</p>

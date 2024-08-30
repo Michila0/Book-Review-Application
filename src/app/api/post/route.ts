@@ -14,14 +14,15 @@ export async function POST(req: NextRequest) {
         }
 
 
-        const { title, author, discription, coverImage} = await req.json();
+        const { title, author, discription} = await req.json();
 
-        if (!title || !author || !discription) {
+        if (!title || !author || !discription ) {
             return NextResponse.json({
                 error: "Missing required fields",
                 status: 400,
             });
         }
+
 
         // Fetch the author object based on the author name
         const authorRecord = await db.author.findFirst({
@@ -49,7 +50,7 @@ export async function POST(req: NextRequest) {
                 title,
                 authorId,
                 discription,
-                coverImage, //'/images/great-gatsby.jpeg',//coverImage || null,
+               //coverImage: coverImage || null, //'/images/great-gatsby.jpeg',//coverImage || null,
 
             }
         });
