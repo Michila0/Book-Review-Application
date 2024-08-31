@@ -63,27 +63,32 @@ export default function FormNewPost({book}: {book?: Book | null}) {
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault()
         try {
-            let imageUrl = formData.coverImage;
+            let imageUrl = formData.coverImage || '';
             console.log('😎: ', imageUrl)
 
             if (selectedImage) {
                 const formDataImage = new FormData();
                 formDataImage.append('file', selectedImage);
 
-                // Add your image upload endpoint here
-                const uploadResponse = await axios.post('/api/upload', formDataImage,
-                    // headers: {
-                    //     'Content-Type': 'multipart/form-data',
-                    // },
-                );
-                imageUrl = uploadResponse.data.url;
-                //return imageUrl
+                // Call your image upload endpoint
+                const uploadResponse = await axios.post('/api/upload', formDataImage);
+                imageUrl = uploadResponse.data.url || '';
+                console.log('image URL: ', imageUrl)
+
+                // Set the image URL in the formData
+                setFormData((prevFormData) => ({
+                    ...prevFormData,
+                    coverImage: imageUrl,
+                }));
             }
 
-
+            if (!imageUrl) {
+                console.error('No cover image URL available');
+                return; // Prevent submitting the form without a cover image URL
+            }
 
             const response =  await axios.post('api/post', {...formData, coverImage: imageUrl});
-            console.log('Response Data:', response)
+            console.log('Response Data:', response.data.newPost.coverImage)
             if (response.status === 200) {
 
                 // router.push(`/books/${response.data.newPost.id}`)
