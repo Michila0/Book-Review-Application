@@ -45,6 +45,7 @@
 
 
 "use client"
+
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import {Review} from "@prisma/client";
@@ -66,10 +67,16 @@ export default function Reviews({ bookId }: ReviewsProps) {
     useEffect(() => {
         const fetchReviews = async () => {
             try {
-                const res = await fetch(`/api/comments?bookId=${bookId}`);
+                const res = await fetch(`/api/comments?bookId=${bookId}`); //?bookId=${bookId}
+                if (!res.ok) {
+                    throw new Error(`Error: ${res.statusText}`);
+                }
+
                 const data = await res.json();
+                console.log('Response Data: ', data)
                 if (Array.isArray(data)) {
                     setReviews(data);
+                    console.log('data:', data)
                 } else {
                     console.error("API did not return an array:", data);
                     setReviews([]);
@@ -88,6 +95,7 @@ export default function Reviews({ bookId }: ReviewsProps) {
     if (loading) {
         return <div>Loading...</div>;
     }
+
 
     if (reviews.length === 0) {
         return <div>🔴No reviews yet.</div>;

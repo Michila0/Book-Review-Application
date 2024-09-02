@@ -15,11 +15,29 @@ export async function POST(req: NextRequest) {
 
         const { bookId, content, rating} = await req.json();
 
-        if (!bookId || !content || rating === undefined) {
+        if (!bookId || !content || !rating) {
             return NextResponse.json({
-                error: "Missing required fields",
+                error: "Missing required fields: bookId, content, and rating are required",
                 status: 400,
             });
+        }
+
+        // Ensure that the user exists before attempting to create the review
+        const userExists = await db.user.findUnique({
+            where: { id: userId },
+        });
+
+        if (!userExists) {
+            return NextResponse.json({ message: 'User does not exist!' }, { status: 404 });
+        }
+
+        // Ensure that the book exists before attempting to create the review
+        const bookExists = await db.book.findUnique({
+            where: { id: bookId },
+        });
+
+        if (!bookExists) {
+            return NextResponse.json({ message: 'Book does not exist!' }, { status: 404 });
         }
 
         // Create a new book post
@@ -41,10 +59,10 @@ export async function POST(req: NextRequest) {
 
             }
         });
-        console.log('New post created: ', newPost)
+        console.log('New comment created: ', newPost)
         return NextResponse.json({newPost}, {status: 200})
     } catch (error) {
-        console.log('Error creating new post: ', error)
+        console.log('Error creating new comment: ', error)
         return NextResponse.json({message: 'Something went wrong'}, {status:500})
     }
 }
@@ -64,7 +82,7 @@ export async function GET(req: NextRequest) {
 
         if (!reviewId && !bookId) {
             return NextResponse.json({
-                error: "Missing required query parameters",
+                error: "Missing required query parameters: either reviewId or bookId must be provided.",
                 status: 400,
             });
         }
