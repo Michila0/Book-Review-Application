@@ -7,9 +7,10 @@ import {Button} from "@/components/ui/button";
 
 interface FormReviewProps {
     bookId: string
+    onReviewSubmit: () => void;
 }
 
-export default function FormReview({bookId}: FormReviewProps) {
+export default function FormReview({bookId, onReviewSubmit}: FormReviewProps) {
     const [review, setReview] = useState<string>('');
     const [rating, setRating] = useState<number>(0);
     const router = useRouter();
@@ -44,15 +45,17 @@ export default function FormReview({bookId}: FormReviewProps) {
                 console.log('newComment: ', newComment.data)
 
                 if (newComment.status === 200) {
-                    router.refresh()
+                    setReview(''); // Clear the review input
+                    setRating(0); // Reset the rating
+                    onReviewSubmit(); // Trigger re-fetch of reviews
                 }
             } catch (error: any) {
-                if (error.response) {
+                if (error.request) {
                     // The request was made and the server responded with a status code
-                    console.error('Server responded with:', error.response.data);
-                } else if (error.request) {
+                    console.error('Server responded with:', error.request);
+                } else if (error.response) {
                     // The request was made but no response was received
-                    console.error('No response received:', error.request);
+                    console.error('No response received:', error.response.data);
                 } else {
                     // Something happened in setting up the request that triggered an Error
                     console.error('Error in request setup:', error.message);

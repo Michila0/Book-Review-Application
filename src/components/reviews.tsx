@@ -58,9 +58,10 @@ interface ReviewWithUser extends Review {
 
 interface ReviewsProps {
     bookId: string;
+    refreshReviews: boolean;
 }
 
-export default function Reviews({ bookId }: ReviewsProps) {
+export default function Reviews({ bookId, refreshReviews }: ReviewsProps) {
     const [reviews, setReviews] = useState<ReviewWithUser[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -90,7 +91,7 @@ export default function Reviews({ bookId }: ReviewsProps) {
         };
 
         fetchReviews();
-    }, [bookId]);
+    }, [bookId, refreshReviews]);
 
     if (loading) {
         return <div>Loading...</div>;

@@ -1,8 +1,7 @@
 import React from 'react';
 import db from "@/db/db";
-import Reviews from "@/components/reviews";
-import FormReview from "@/components/form-review";
 import Image from "next/image";
+import BookDetailsClient from "@/components/bookDetailsClient";
 
 interface BookDetailPageProps {
     params: {
@@ -11,6 +10,7 @@ interface BookDetailPageProps {
 }
 
 export default async function BookDetailsPage({params}: BookDetailPageProps) {
+
     const book = await db.book.findFirst({
         where: {
             id: params.id
@@ -19,7 +19,6 @@ export default async function BookDetailsPage({params}: BookDetailPageProps) {
             author: true
         }
     })
-
 
     return (
         <div className='max-w-4xl mx-auto py-8'>
@@ -41,8 +40,10 @@ export default async function BookDetailsPage({params}: BookDetailPageProps) {
             }
             <div className="mt-4">{book?.discription}</div>
 
-            <Reviews bookId={params.id}/>
-            <FormReview bookId={params.id}/>
+            {/*<Reviews bookId={params.id} refreshReviews={refreshReviews}/>*/}
+            {/*<FormReview bookId={params.id} onReviewSubmit={handleReviewSubmit}/>*/}
+
+            <BookDetailsClient bookId={params.id}/>
         </div>
     );
 }
